@@ -41,9 +41,19 @@ var MovieSchema = new Schema({
     required: 'Please enter the movie release date'
   },
 
+  views: {
+    type: Number,
+    default: 0
+  },
+
   rating: {
     type: Number,
     default: 5
+  },
+
+  amountOfRatings: {
+    type: Number,
+    default: 1
   }
 
 });

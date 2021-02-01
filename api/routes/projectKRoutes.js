@@ -17,10 +17,19 @@ module.exports = function(app) {
     .post(projectK.createMovie)
 
   app.route('/rate-movie')
-    .put(projectK.rateMovie)
+    .post(projectK.rateMovie)
+  
+  app.route('/add-view')
+    .post(projectK.addView)
 
-  app.route('/get-single-movie')
-    .post(projectK.getSingleMovie)
+  app.route('/search-movie-by-title')
+    .post(projectK.searchMovieByTitle)
+  
+  app.route('/search-movie-by-categories')
+    .post(projectK.searchMovieByCategories)
+  
+  app.route('/get-novelties/:daysToConsiderNovelty')
+    .get(projectK.getNovelties)
 
 
 
