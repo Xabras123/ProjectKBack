@@ -28,7 +28,6 @@ exports.createMovie = function(req, res) {
     }
     
     for( var i = 0 ; i < movies.length ; i++){
-      console.log(movies[i]._doc.title)
       if(movies[i]._doc.title.toLowerCase() == req.body.title.toLowerCase()){
         res.send("Movie with that title already exist!");
         return
@@ -197,10 +196,6 @@ exports.getNovelties = function(req, res) {
 
 
 function calculateRating(amountOfRatings, userRating, movieLikes){
-
-  console.log("------------")
-  console.log(userRating)
-  console.log(Math.floor(((movieLikes + 1) * 100) / (amountOfRatings + 1)))
 
 
   if(userRating){
