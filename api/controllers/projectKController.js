@@ -35,9 +35,10 @@ exports.createMovie = function(req, res) {
       }
     } 
     var newMovie = new Movie(req.body);
-    newMovie.rating = 5;
+    newMovie.movieLikePercentage = 0;
+    newMovie.movieLikes = 0;
     newMovie.views = 0;
-    newMovie.amountOfRatings = 1;
+    newMovie.amountOfRatings = 0;
     newMovie.save(function(err, movie) {
       if (err){
         res.send(err);
@@ -100,9 +101,9 @@ exports.searchMovieByCategories = function(req, res) {
 
 exports.rateMovie = function(req, res) {
 
-  if(req.body.rating > 10 || req.body.rating < 0){
+  if(req.body.rating == null){
 
-    res.send('{ "message": "Rating must be between 0 and 10"}');
+    res.send('{ "message": "please add a valid rating"}');
     return
 
   }
@@ -113,18 +114,25 @@ exports.rateMovie = function(req, res) {
         
         res.send('{ "message": "Movie With id: ' + req.body.movieId + ' not found"}');
       }
+
+      var userLike = 0;
+      if(req.body.rating)
+        userLike++;
+
+      var movieRating = calculateRating(foundMovie._doc.amountOfRatings, req.body.rating, foundMovie._doc.movieLikes)
       
-      return Movie.updateOne({_id: req.body.movieId},  {
-                                                  rating : calculateRating(foundMovie._doc.amountOfRatings, foundMovie._doc.rating, req.body.rating), 
-                                                  amountOfRatings: foundMovie._doc.amountOfRatings + 1 
-                                                }
-      , function(err, movie) {
-        if (err){
-          console.log(err)
-          res.send('Error ocurred updating the rating ' );
-        }
-        res.json("{rating:" + calculateRating(foundMovie._doc.amountOfRatings, foundMovie._doc.rating, req.body.rating) +  "}");
-      });
+        return Movie.updateOne({_id: req.body.movieId},  {
+                                                    movieLikePercentage : movieRating, 
+                                                    amountOfRatings: foundMovie._doc.amountOfRatings + 1,
+                                                    movieLikes: foundMovie._doc.movieLikes + userLike
+                                                  }
+        , function(err, movie) {
+          if (err){
+            res.send('Error ocurred updating the rating ' );
+            return
+          }
+          res.json({rating:  movieRating });
+        });
   });
 };
 
@@ -143,7 +151,8 @@ exports.addView = function(req, res) {
         
         res.send("Error ocurred in the server during the update");
       }
-      res.json(movieToUpdate);
+      movie._doc.views++;
+      res.json({views:  movie._doc.views  });
     });
   });
   
@@ -187,9 +196,25 @@ exports.getNovelties = function(req, res) {
 };
 
 
-function calculateRating(amountOfRatings, movieRating, rating){
+function calculateRating(amountOfRatings, userRating, movieLikes){
 
-  return ((movieRating * amountOfRatings) + rating) / (amountOfRatings + 1)
+  console.log("------------")
+  console.log(userRating)
+  console.log(Math.floor(((movieLikes + 1) * 100) / (amountOfRatings + 1)))
+
+
+  if(userRating){
+
+    return Math.floor(((movieLikes + 1) * 100) / (amountOfRatings + 1));
+  }else{
+
+    if(amountOfRatings == 0){
+      return 0;
+    }
+    return Math.floor(((movieLikes) * 100) / (amountOfRatings + 1));
+  }
+
+
 }
 
 

@@ -46,15 +46,20 @@ var MovieSchema = new Schema({
     default: 0
   },
 
-  rating: {
+  movieLikes: {
     type: Number,
-    default: 5
+    default: 0
   },
 
   amountOfRatings: {
     type: Number,
-    default: 1
-  }
+    default: 0
+  },
+
+  movieLikePercentage: {
+    type: Number,
+    default: 0
+  },
 
 });
 
